@@ -5,7 +5,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="flex justify-center">
       <Sidebar />
-      <main className="ml-[275px] mr-[350px] w-[600px] min-h-screen border-x border-[var(--qube-border)]">
+      <main className="xl:ml-[275px] lg:ml-[88px] xl:mr-[350px] w-full max-w-[600px] min-h-screen border-x border-[var(--qube-border)]">
         {children}
       </main>
       <RightSidebar />

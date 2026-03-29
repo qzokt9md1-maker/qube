@@ -2,43 +2,44 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/home", icon: "home", label: "Home" },
-  { href: "/search", icon: "search", label: "Search" },
-  { href: "/notifications", icon: "bell", label: "Notifications" },
-  { href: "/messages", icon: "mail", label: "Messages" },
-  { href: "/bookmarks", icon: "bookmark", label: "Bookmarks" },
-  { href: "/profile", icon: "user", label: "Profile" },
+  { href: "/home", label: "Home", icon: "home" },
+  { href: "/search", label: "Search", icon: "search" },
+  { href: "/notifications", label: "Notifications", icon: "bell" },
+  { href: "/messages", label: "Messages", icon: "mail" },
+  { href: "/bookmarks", label: "Bookmarks", icon: "bookmark" },
+  { href: "/profile", label: "Profile", icon: "user" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-[275px] border-r border-[var(--qube-border)] flex flex-col p-4">
+    <aside className="fixed left-0 top-0 h-full w-[275px] flex flex-col px-3 py-2 border-r border-[var(--qube-border)] xl:w-[275px] lg:w-[88px] max-lg:hidden">
       {/* Logo */}
-      <Link href="/home" className="text-3xl font-bold px-4 py-3">
-        <span className="text-[var(--qube-accent)]">Q</span>ube
+      <Link href="/home" className="flex items-center h-[50px] px-3 mb-1 group">
+        <span className="text-3xl font-black tracking-tight lg:block">
+          <span className="bg-gradient-to-r from-[var(--qube-primary)] to-purple-400 bg-clip-text text-transparent">Q</span>
+          <span className="xl:inline lg:hidden">ube</span>
+        </span>
       </Link>
 
       {/* Nav */}
-      <nav className="mt-4 flex flex-col gap-1">
+      <nav className="flex flex-col gap-0.5 mt-1">
         {navItems.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={cn(
-                "flex items-center gap-4 px-4 py-3 rounded-full text-xl transition-colors",
-                isActive ? "font-bold" : "font-normal",
-                "hover:bg-[var(--qube-surface-hover)]"
-              )}
+              className={`flex items-center gap-5 px-4 py-3 rounded-full text-[15px] transition-all duration-150 hover:bg-[var(--qube-surface-hover)] ${isActive ? "font-bold" : "font-normal"}`}
             >
               <NavIcon name={item.icon} active={isActive} />
-              <span>{item.label}</span>
+              <span className="xl:inline lg:hidden">{item.label}</span>
+              {item.icon === "bell" && (
+                <span className="xl:inline lg:hidden ml-auto w-2 h-2 rounded-full bg-[var(--qube-primary)] opacity-0" />
+              )}
             </Link>
           );
         })}
@@ -47,51 +48,75 @@ export function Sidebar() {
       {/* Post button */}
       <Link
         href="/compose"
-        className="mt-4 w-full bg-[var(--qube-primary)] hover:bg-[var(--qube-primary-dark)] text-white font-bold text-lg py-3 rounded-full text-center transition-colors"
+        className="mt-4 flex items-center justify-center xl:w-full lg:w-12 lg:h-12 lg:mx-auto bg-[var(--qube-primary)] hover:bg-[var(--qube-primary-dark)] text-white font-bold xl:text-lg xl:py-3 rounded-full text-center transition-all hover:shadow-[0_0_20px_rgba(99,102,241,0.3)]"
       >
-        Post
+        <span className="xl:inline lg:hidden">Post</span>
+        <svg className="w-6 h-6 xl:hidden lg:block hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path d="M12 4v16m8-8H4" />
+        </svg>
       </Link>
 
-      {/* User at bottom */}
-      <div className="mt-auto p-4">
-        {/* Populated after auth */}
+      {/* User card at bottom */}
+      <div className="mt-auto mb-3">
+        <button className="flex items-center gap-3 w-full p-3 rounded-full hover:bg-[var(--qube-surface-hover)] transition-colors">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--qube-primary)] to-purple-600 flex items-center justify-center shrink-0">
+            <span className="text-sm font-bold">K</span>
+          </div>
+          <div className="flex-1 text-left xl:block lg:hidden min-w-0">
+            <div className="text-sm font-bold truncate">Kagura</div>
+            <div className="text-xs text-[var(--qube-text-secondary)] truncate">@kagura</div>
+          </div>
+          <svg className="w-4 h-4 text-[var(--qube-text-secondary)] xl:block lg:hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+          </svg>
+        </button>
       </div>
     </aside>
   );
 }
 
 function NavIcon({ name, active }: { name: string; active: boolean }) {
-  const icons: Record<string, React.ReactNode> = {
-    home: (
-      <svg className="w-7 h-7" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={active ? "0" : "2"} viewBox="0 0 24 24">
-        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-      </svg>
-    ),
-    search: (
-      <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-        <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
-    ),
-    bell: (
-      <svg className="w-7 h-7" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={active ? "0" : "2"} viewBox="0 0 24 24">
-        <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-      </svg>
-    ),
-    mail: (
-      <svg className="w-7 h-7" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={active ? "0" : "2"} viewBox="0 0 24 24">
-        <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    ),
-    bookmark: (
-      <svg className="w-7 h-7" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={active ? "0" : "2"} viewBox="0 0 24 24">
-        <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-      </svg>
-    ),
-    user: (
-      <svg className="w-7 h-7" fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={active ? "0" : "2"} viewBox="0 0 24 24">
-        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    ),
-  };
-  return icons[name] || null;
+  const strokeW = active ? "2.5" : "1.8";
+  const cls = "w-[26px] h-[26px] shrink-0";
+
+  switch (name) {
+    case "home":
+      return (
+        <svg className={cls} fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={strokeW} viewBox="0 0 24 24">
+          <path d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+      );
+    case "search":
+      return (
+        <svg className={cls} fill="none" stroke="currentColor" strokeWidth={strokeW} viewBox="0 0 24 24">
+          <path d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+      );
+    case "bell":
+      return (
+        <svg className={cls} fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={strokeW} viewBox="0 0 24 24">
+          <path d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+        </svg>
+      );
+    case "mail":
+      return (
+        <svg className={cls} fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={strokeW} viewBox="0 0 24 24">
+          <path d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+        </svg>
+      );
+    case "bookmark":
+      return (
+        <svg className={cls} fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={strokeW} viewBox="0 0 24 24">
+          <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+        </svg>
+      );
+    case "user":
+      return (
+        <svg className={cls} fill={active ? "currentColor" : "none"} stroke="currentColor" strokeWidth={strokeW} viewBox="0 0 24 24">
+          <path d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+        </svg>
+      );
+    default:
+      return null;
+  }
 }
