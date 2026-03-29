@@ -117,6 +117,18 @@ func main() {
 		hub.HandleWebSocket(w, r, userID)
 	})
 
+	// Upload endpoint
+	uploadDir := "./uploads"
+	uploadHandler := &handler.UploadHandler{
+		UploadDir: uploadDir,
+		BaseURL:   "http://localhost:8080",
+	}
+	r.Handle("/upload", uploadHandler)
+
+	// Serve uploaded files
+	fileServer := http.FileServer(http.Dir(uploadDir))
+	r.Handle("/uploads/*", http.StripPrefix("/uploads/", fileServer))
+
 	// Suppress unused variable warnings
 	_ = hashtagRepo
 	_ = cursorRepo

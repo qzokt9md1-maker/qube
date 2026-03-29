@@ -34,3 +34,4 @@ Thumbs.db
 postgres_data/
 redis_data/
 meilisearch_data/
+uploads/
