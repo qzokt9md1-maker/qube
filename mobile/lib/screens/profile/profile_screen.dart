@@ -19,7 +19,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   late TabController _tabController;
   QubeUser? _user;
   List<QubePost> _posts = [];
-  List<QubePost> _likes = [];
+  final List<QubePost> _likes = [];
   bool _isLoading = true;
 
   @override

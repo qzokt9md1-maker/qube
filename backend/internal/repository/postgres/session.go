@@ -17,8 +17,8 @@ func NewSessionRepo(pool *pgxpool.Pool) *SessionRepo {
 }
 
 func (r *SessionRepo) Create(ctx context.Context, session *model.Session) error {
-	query := `INSERT INTO sessions (id, user_id, refresh_token, user_agent, ip_address, expires_at, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7)`
-	_, err := r.pool.Exec(ctx, query, session.ID, session.UserID, session.RefreshToken, session.UserAgent, session.IPAddress, session.ExpiresAt, session.CreatedAt)
+	query := `INSERT INTO sessions (id, user_id, refresh_token, user_agent, expires_at, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := r.pool.Exec(ctx, query, session.ID, session.UserID, session.RefreshToken, session.UserAgent, session.ExpiresAt, session.CreatedAt)
 	return err
 }
 
