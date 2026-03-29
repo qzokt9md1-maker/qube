@@ -16,56 +16,52 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-[275px] flex flex-col py-2 border-r border-[var(--qube-border)] xl:w-[275px] lg:w-[88px] max-lg:hidden">
-      <div className="flex flex-col items-center xl:items-stretch xl:px-3 lg:px-0">
-        {/* Logo - same width as nav icons */}
-        <Link href="/home" className="flex items-center justify-center xl:justify-start h-[50px] w-[50px] xl:w-auto xl:px-4 mb-1 rounded-full hover:bg-[var(--qube-surface-hover)] transition-colors">
-          <span className="text-2xl font-black tracking-tight">
-            <span className="text-[var(--qube-primary)]">Q</span><span className="xl:inline lg:hidden">ube</span>
-          </span>
-        </Link>
+    <aside className="fixed left-0 top-0 h-full w-[275px] flex flex-col items-center xl:items-stretch xl:px-3 lg:px-0 py-2 border-r border-[var(--qube-border)] xl:w-[275px] lg:w-[88px] max-lg:hidden">
+      {/* Logo */}
+      <Link href="/home" className="flex items-center justify-center xl:justify-start h-[50px] w-[50px] xl:w-auto xl:px-4 mb-1 rounded-full hover:bg-[var(--qube-surface-hover)] transition-colors">
+        <span className="text-2xl font-black tracking-tight">
+          <span className="text-[var(--qube-primary)]">Q</span><span className="xl:inline lg:hidden">ube</span>
+        </span>
+      </Link>
 
-        {/* Nav */}
-        <nav className="flex flex-col gap-0.5 mt-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center justify-center xl:justify-start gap-5 w-[50px] h-[50px] xl:w-auto xl:h-auto xl:px-4 xl:py-3 rounded-full text-[15px] transition-colors hover:bg-[var(--qube-surface-hover)] ${isActive ? "font-bold text-[var(--qube-primary)]" : ""}`}
-              >
-                <NavIcon name={item.icon} active={isActive} />
-                <span className="xl:inline lg:hidden">{item.label}</span>
-              </Link>
-            );
-          })}
-        </nav>
+      {/* Nav */}
+      <nav className="flex flex-col gap-0.5 mt-1">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center justify-center xl:justify-start gap-5 w-[50px] h-[50px] xl:w-auto xl:h-auto xl:px-4 xl:py-3 rounded-full text-[15px] transition-colors hover:bg-[var(--qube-surface-hover)] ${isActive ? "font-bold text-[var(--qube-primary)]" : ""}`}
+            >
+              <NavIcon name={item.icon} active={isActive} />
+              <span className="xl:inline lg:hidden">{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
-        {/* Post button - same width as nav icons on lg */}
-        <button className="mt-4 w-[50px] h-[50px] xl:w-full xl:h-auto xl:py-3 flex items-center justify-center bg-[var(--qube-primary)] hover:bg-[var(--qube-primary-dark)] text-white font-bold rounded-full transition-colors">
-          <span className="xl:inline lg:hidden">Post</span>
-          <svg className="w-6 h-6 xl:hidden lg:block hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
-      </div>
+      {/* Post button */}
+      <button className="mt-4 w-[50px] h-[50px] xl:w-full xl:h-auto xl:py-3 flex items-center justify-center bg-[var(--qube-primary)] hover:bg-[var(--qube-primary-dark)] text-white font-bold rounded-full transition-colors">
+        <span className="xl:inline lg:hidden">Post</span>
+        <svg className="w-6 h-6 xl:hidden lg:block hidden" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+
+      {/* Spacer */}
+      <div className="flex-1" />
 
       {/* User at bottom */}
-      <div className="mt-auto flex justify-center xl:justify-stretch xl:px-3 mb-3">
-        <button className="flex items-center justify-center xl:justify-start gap-3 w-[50px] h-[50px] xl:w-full xl:h-auto xl:p-3 rounded-full hover:bg-[var(--qube-surface-hover)] transition-colors">
-          <div className="w-10 h-10 rounded-full bg-[var(--qube-surface)] flex items-center justify-center shrink-0">
-            <span className="text-sm font-bold text-[var(--qube-text-secondary)]">K</span>
-          </div>
-          <div className="flex-1 text-left xl:block lg:hidden min-w-0">
-            <div className="text-sm font-bold truncate">Kagura</div>
-            <div className="text-xs text-[var(--qube-text-secondary)] truncate">@kagura</div>
-          </div>
-          <svg className="w-4 h-4 text-[var(--qube-text-secondary)] xl:block lg:hidden hidden" fill="currentColor" viewBox="0 0 24 24">
-            <circle cx="5" cy="12" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="19" cy="12" r="1.5" />
-          </svg>
-        </button>
-      </div>
+      <button className="flex items-center justify-center xl:justify-start gap-3 w-[50px] h-[50px] xl:w-full xl:h-auto xl:p-3 mb-3 rounded-full hover:bg-[var(--qube-surface-hover)] transition-colors">
+        <div className="w-10 h-10 rounded-full bg-[var(--qube-surface)] flex items-center justify-center shrink-0">
+          <span className="text-sm font-bold text-[var(--qube-text-secondary)]">K</span>
+        </div>
+        <div className="flex-1 text-left xl:block lg:hidden min-w-0">
+          <div className="text-sm font-bold truncate">Kagura</div>
+          <div className="text-xs text-[var(--qube-text-secondary)] truncate">@kagura</div>
+        </div>
+      </button>
     </aside>
   );
 }
