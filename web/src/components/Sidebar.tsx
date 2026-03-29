@@ -49,11 +49,8 @@ export function Sidebar() {
         </svg>
       </button>
 
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* User at bottom */}
-      <button className="flex items-center justify-center xl:justify-start gap-3 w-[50px] h-[50px] xl:w-full xl:h-auto xl:p-3 mb-8 rounded-full hover:bg-[var(--qube-surface-hover)] transition-colors">
+      {/* User - placed after post button, not at bottom */}
+      <button className="mt-4 flex items-center justify-center xl:justify-start gap-3 w-[50px] h-[50px] xl:w-full xl:h-auto xl:p-3 rounded-full hover:bg-[var(--qube-surface-hover)] transition-colors">
         <div className="w-10 h-10 rounded-full bg-[var(--qube-surface)] flex items-center justify-center shrink-0">
           <span className="text-sm font-bold text-[var(--qube-text-secondary)]">K</span>
         </div>
