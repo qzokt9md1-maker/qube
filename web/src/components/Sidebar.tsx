@@ -20,7 +20,7 @@ export function Sidebar() {
       {/* Logo */}
       <Link href="/home" className="flex items-center h-[50px] px-3 mb-1">
         <span className="text-2xl font-black tracking-tight">
-          Q<span className="xl:inline lg:hidden">ube</span>
+          <span className="text-[var(--qube-primary)]">Q</span><span className="xl:inline lg:hidden">ube</span>
         </span>
       </Link>
 
@@ -32,7 +32,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-5 px-4 py-3 rounded-full text-[15px] transition-colors hover:bg-[var(--qube-surface-hover)] ${isActive ? "font-bold" : ""}`}
+              className={`flex items-center gap-5 px-4 py-3 rounded-full text-[15px] transition-colors hover:bg-[var(--qube-surface-hover)] ${isActive ? "font-bold text-[var(--qube-primary)]" : ""}`}
             >
               <NavIcon name={item.icon} active={isActive} />
               <span className="xl:inline lg:hidden">{item.label}</span>

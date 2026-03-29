@@ -65,7 +65,7 @@ export default function HomePage() {
       {/* Header */}
       <div className="sticky top-0 z-10 bg-[var(--qube-bg)]/80 backdrop-blur-md border-b border-[var(--qube-border)]">
         <div className="flex items-center justify-between px-4 h-[53px]">
-          <h1 className="text-xl font-bold">Home</h1>
+          <h1 className="text-xl font-bold"><span className="text-[var(--qube-primary)]">Q</span>ube</h1>
           {unread > 0 && (
             <button onClick={loadTimeline} className="text-[var(--qube-primary)] text-sm font-medium hover:underline">
               {unread} new post{unread > 1 ? "s" : ""}

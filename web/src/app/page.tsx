@@ -14,7 +14,7 @@ export default function Home() {
       <div className="flex flex-1 items-center justify-center px-8">
         <div className="max-w-[380px] w-full">
           <h1 className="text-[40px] font-black tracking-tight mb-12 leading-tight">
-            Qube
+            <span className="text-[var(--qube-primary)]">Q</span>ube
           </h1>
           <h2 className="text-[28px] font-bold mb-2">See everything.</h2>
           <h2 className="text-[28px] font-bold mb-8">Miss nothing.</h2>
