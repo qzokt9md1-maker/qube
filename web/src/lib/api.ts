@@ -1,35 +1,72 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/graphql";
 
+// Node.js 22+ has a broken global localStorage (no getItem method without --localstorage-file).
+// We must check for both window AND working localStorage.
+function isBrowserWithStorage(): boolean {
+  try {
+    return typeof window !== "undefined" && typeof window.document !== "undefined" && typeof window.localStorage?.getItem === "function";
+  } catch {
+    return false;
+  }
+}
+
+function getStorage(key: string): string | null {
+  if (!isBrowserWithStorage()) return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function setStorage(key: string, value: string) {
+  if (!isBrowserWithStorage()) return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {}
+}
+
+function removeStorage(key: string) {
+  if (!isBrowserWithStorage()) return;
+  try {
+    window.localStorage.removeItem(key);
+  } catch {}
+}
+
 class ApiClient {
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
+  private initialized = false;
 
-  constructor() {
-    if (typeof window !== "undefined") {
-      this.accessToken = localStorage.getItem("qube_token");
-      this.refreshToken = localStorage.getItem("qube_refresh");
-    }
+  private init() {
+    if (this.initialized) return;
+    this.initialized = true;
+    this.accessToken = getStorage("qube_token");
+    this.refreshToken = getStorage("qube_refresh");
   }
 
   setTokens(access: string, refresh: string) {
     this.accessToken = access;
     this.refreshToken = refresh;
-    localStorage.setItem("qube_token", access);
-    localStorage.setItem("qube_refresh", refresh);
+    setStorage("qube_token", access);
+    setStorage("qube_refresh", refresh);
   }
 
   clearTokens() {
     this.accessToken = null;
     this.refreshToken = null;
-    localStorage.removeItem("qube_token");
-    localStorage.removeItem("qube_refresh");
+    removeStorage("qube_token");
+    removeStorage("qube_refresh");
   }
 
   get isLoggedIn() {
+    this.init();
     return !!this.accessToken;
   }
 
   async query<T = any>(operationName: string, variables?: Record<string, any>): Promise<T> {
+    this.init();
+
     const res = await fetch(API_URL, {
       method: "POST",
       headers: {
