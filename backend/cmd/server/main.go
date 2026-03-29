@@ -12,13 +12,75 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/google/uuid"
 	"github.com/kuzuokatakumi/qube/internal/config"
+	"github.com/kuzuokatakumi/qube/internal/db"
+	"github.com/kuzuokatakumi/qube/internal/handler"
 	"github.com/kuzuokatakumi/qube/internal/middleware"
+	"github.com/kuzuokatakumi/qube/internal/repository/postgres"
+	"github.com/kuzuokatakumi/qube/internal/service"
+	"github.com/kuzuokatakumi/qube/internal/ws"
 )
 
 func main() {
 	cfg := config.Load()
 
+	// Database
+	pool, err := db.NewPostgresPool(cfg.DB)
+	if err != nil {
+		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+	}
+	defer pool.Close()
+	log.Println("Connected to PostgreSQL")
+
+	// Redis
+	rdb, err := db.NewRedisClient(cfg.Redis)
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %v", err)
+	}
+	defer rdb.Close()
+	log.Println("Connected to Redis")
+
+	// WebSocket Hub
+	hub := ws.NewHub()
+	go hub.Run()
+
+	// Repositories
+	userRepo := postgres.NewUserRepo(pool)
+	postRepo := postgres.NewPostRepo(pool)
+	followRepo := postgres.NewFollowRepo(pool)
+	likeRepo := postgres.NewLikeRepo(pool)
+	bookmarkRepo := postgres.NewBookmarkRepo(pool)
+	convRepo := postgres.NewConversationRepo(pool)
+	msgRepo := postgres.NewMessageRepo(pool)
+	notifRepo := postgres.NewNotificationRepo(pool)
+	sessionRepo := postgres.NewSessionRepo(pool)
+	blockRepo := postgres.NewBlockRepo(pool)
+	muteRepo := postgres.NewMuteRepo(pool)
+	hashtagRepo := postgres.NewHashtagRepo(pool)
+	cursorRepo := postgres.NewTimelineCursorRepo(pool)
+
+	// Services
+	notifService := service.NewNotificationService(notifRepo, hub)
+	timelineService := service.NewTimelineService(rdb, postRepo, followRepo, cursorRepo)
+	authService := service.NewAuthService(userRepo, sessionRepo, cfg.JWT)
+	userService := service.NewUserService(userRepo, blockRepo, muteRepo)
+	postService := service.NewPostService(postRepo, userRepo, hashtagRepo, likeRepo, bookmarkRepo, notifService, timelineService)
+	followService := service.NewFollowService(followRepo, userRepo, blockRepo, notifService)
+	dmService := service.NewDMService(convRepo, msgRepo, blockRepo, notifService, hub)
+
+	// GraphQL Handler
+	gqlHandler := &handler.GraphQLHandler{
+		AuthService:     authService,
+		UserService:     userService,
+		PostService:     postService,
+		FollowService:   followService,
+		DMService:       dmService,
+		NotifService:    notifService,
+		TimelineService: timelineService,
+	}
+
+	// Router
 	r := chi.NewRouter()
 
 	// Middleware
@@ -42,12 +104,22 @@ func main() {
 		w.Write([]byte(`{"status":"ok"}`))
 	})
 
-	// TODO: Mount GraphQL handler
-	// r.Handle("/graphql", graphqlHandler)
-	// r.Handle("/playground", playground.Handler("Qube", "/graphql"))
+	// GraphQL endpoint
+	r.Handle("/graphql", gqlHandler)
 
-	// TODO: WebSocket endpoint for subscriptions
-	// r.Handle("/ws", wsHandler)
+	// WebSocket endpoint
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		userID, ok := middleware.GetUserID(r.Context())
+		if !ok {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		hub.HandleWebSocket(w, r, userID)
+	})
+
+	// Suppress unused variable warnings
+	_ = hashtagRepo
+	_ = cursorRepo
 
 	srv := &http.Server{
 		Addr:         ":" + cfg.Server.Port,
@@ -59,7 +131,7 @@ func main() {
 
 	// Graceful shutdown
 	go func() {
-		log.Printf("🟢 Qube server starting on port %s (env: %s)", cfg.Server.Port, cfg.Server.Env)
+		log.Printf("Qube server starting on port %s (env: %s)", cfg.Server.Port, cfg.Server.Env)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server error: %v", err)
 		}
@@ -77,4 +149,7 @@ func main() {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}
 	log.Println("Server stopped")
+
+	// Ensure uuid is used
+	_ = uuid.Nil
 }

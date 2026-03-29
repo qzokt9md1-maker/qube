@@ -1,0 +1,30 @@
+schema:
+  - ../graph/*.graphqls
+
+exec:
+  filename: graph/generated.go
+  package: graph
+
+model:
+  filename: graph/model/models_gen.go
+  package: model
+
+resolver:
+  layout: follow-schema
+  dir: graph
+  package: graph
+  filename_template: "{name}.resolvers.go"
+
+autobind:
+  - github.com/kuzuokatakumi/qube/graph/model
+
+models:
+  UUID:
+    model:
+      - github.com/google/uuid.UUID
+  Time:
+    model:
+      - github.com/99designs/gqlgen/graphql.Time
+  Upload:
+    model:
+      - github.com/99designs/gqlgen/graphql.Upload

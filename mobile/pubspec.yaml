@@ -24,6 +24,9 @@ dependencies:
   cached_network_image: ^3.3.1
   shimmer: ^3.0.0
   image_picker: ^1.0.8
+  # HTTP & WebSocket
+  http: ^1.2.1
+  web_socket_channel: ^3.0.1
   # Utils
   timeago: ^3.6.1
   url_launcher: ^6.2.5
