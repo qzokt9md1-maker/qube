@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --qube-primary: #1d9bf0;
-  --qube-primary-dark: #1a8cd8;
+  --qube-primary: #c9a96e;
+  --qube-primary-dark: #b8955d;
   --qube-bg: #000000;
   --qube-surface: #16181c;
   --qube-surface-hover: #1d1f23;
