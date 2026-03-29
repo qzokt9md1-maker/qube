@@ -1,0 +1,40 @@
+name: qube
+description: "A social network where you never miss a post."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  # GraphQL
+  graphql_flutter: ^5.1.2
+  # Navigation
+  go_router: ^14.0.0
+  # Storage
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.2.3
+  # UI
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  image_picker: ^1.0.8
+  # Utils
+  timeago: ^3.6.1
+  url_launcher: ^6.2.5
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  riverpod_generator: ^2.4.0
+  build_runner: ^2.4.9
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,309 @@
+# Qube GraphQL Schema
+
+# ============================================================
+# Scalars
+# ============================================================
+scalar Time
+scalar UUID
+scalar Upload
+
+# ============================================================
+# Types
+# ============================================================
+type User {
+  id: UUID!
+  username: String!
+  displayName: String!
+  bio: String!
+  avatarUrl: String!
+  headerUrl: String!
+  location: String!
+  website: String!
+  isVerified: Boolean!
+  isPrivate: Boolean!
+  followerCount: Int!
+  followingCount: Int!
+  postCount: Int!
+  isFollowing: Boolean!
+  isFollowedBy: Boolean!
+  isBlocked: Boolean!
+  isMuted: Boolean!
+  createdAt: Time!
+}
+
+type Post {
+  id: UUID!
+  user: User!
+  content: String!
+  media: [Media!]!
+  replyTo: Post
+  repostOf: Post
+  quoteOf: Post
+  likeCount: Int!
+  repostCount: Int!
+  replyCount: Int!
+  quoteCount: Int!
+  isLiked: Boolean!
+  isReposted: Boolean!
+  isBookmarked: Boolean!
+  hashtags: [String!]!
+  createdAt: Time!
+}
+
+type Media {
+  id: UUID!
+  mediaType: MediaType!
+  url: String!
+  thumbnailUrl: String!
+  width: Int
+  height: Int
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+  GIF
+}
+
+type Conversation {
+  id: UUID!
+  isGroup: Boolean!
+  name: String!
+  participants: [User!]!
+  lastMessage: Message
+  unreadCount: Int!
+  updatedAt: Time!
+}
+
+type Message {
+  id: UUID!
+  conversationId: UUID!
+  sender: User!
+  content: String!
+  createdAt: Time!
+}
+
+type Notification {
+  id: UUID!
+  actor: User!
+  type: NotificationType!
+  post: Post
+  isRead: Boolean!
+  createdAt: Time!
+}
+
+enum NotificationType {
+  LIKE
+  REPOST
+  FOLLOW
+  REPLY
+  QUOTE
+  MENTION
+  DM
+}
+
+type AuthPayload {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
+type TimelineConnection {
+  posts: [Post!]!
+  hasMore: Boolean!
+  cursor: String
+  unreadCount: Int!
+}
+
+type PostConnection {
+  posts: [Post!]!
+  hasMore: Boolean!
+  cursor: String
+}
+
+type UserConnection {
+  users: [User!]!
+  hasMore: Boolean!
+  cursor: String
+}
+
+type ConversationConnection {
+  conversations: [Conversation!]!
+  hasMore: Boolean!
+  cursor: String
+}
+
+type MessageConnection {
+  messages: [Message!]!
+  hasMore: Boolean!
+  cursor: String
+}
+
+type NotificationConnection {
+  notifications: [Notification!]!
+  hasMore: Boolean!
+  unreadCount: Int!
+  cursor: String
+}
+
+# ============================================================
+# Inputs
+# ============================================================
+input RegisterInput {
+  username: String!
+  displayName: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input UpdateProfileInput {
+  displayName: String
+  bio: String
+  location: String
+  website: String
+  isPrivate: Boolean
+}
+
+input CreatePostInput {
+  content: String!
+  replyToId: UUID
+  quoteOfId: UUID
+  mediaIds: [UUID!]
+}
+
+input SendMessageInput {
+  conversationId: UUID!
+  content: String!
+}
+
+input CreateConversationInput {
+  participantIds: [UUID!]!
+  message: String!
+}
+
+# ============================================================
+# Queries
+# ============================================================
+type Query {
+  # Auth
+  me: User!
+
+  # Users
+  user(username: String!): User!
+  searchUsers(query: String!, limit: Int = 20, cursor: String): UserConnection!
+
+  # Timeline (時系列・未読管理付き)
+  timeline(limit: Int = 20, cursor: String): TimelineConnection!
+  userPosts(username: String!, limit: Int = 20, cursor: String): PostConnection!
+  userLikes(username: String!, limit: Int = 20, cursor: String): PostConnection!
+
+  # Posts
+  post(id: UUID!): Post!
+  postReplies(postId: UUID!, limit: Int = 20, cursor: String): PostConnection!
+
+  # Follow
+  followers(username: String!, limit: Int = 20, cursor: String): UserConnection!
+  following(username: String!, limit: Int = 20, cursor: String): UserConnection!
+
+  # DM
+  conversations(limit: Int = 20, cursor: String): ConversationConnection!
+  messages(conversationId: UUID!, limit: Int = 30, cursor: String): MessageConnection!
+
+  # Notifications
+  notifications(limit: Int = 20, cursor: String): NotificationConnection!
+
+  # Search
+  searchPosts(query: String!, limit: Int = 20, cursor: String): PostConnection!
+
+  # Trending
+  trendingHashtags(limit: Int = 10): [Hashtag!]!
+
+  # Bookmarks
+  bookmarks(limit: Int = 20, cursor: String): PostConnection!
+}
+
+type Hashtag {
+  name: String!
+  postCount: Int!
+}
+
+# ============================================================
+# Mutations
+# ============================================================
+type Mutation {
+  # Auth
+  register(input: RegisterInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload!
+  refreshToken(token: String!): AuthPayload!
+  logout: Boolean!
+
+  # Profile
+  updateProfile(input: UpdateProfileInput!): User!
+  updateAvatar(file: Upload!): User!
+  updateHeader(file: Upload!): User!
+
+  # Posts
+  createPost(input: CreatePostInput!): Post!
+  deletePost(id: UUID!): Boolean!
+
+  # Interactions
+  likePost(postId: UUID!): Post!
+  unlikePost(postId: UUID!): Post!
+  repost(postId: UUID!): Post!
+  unrepost(postId: UUID!): Boolean!
+  bookmarkPost(postId: UUID!): Boolean!
+  unbookmarkPost(postId: UUID!): Boolean!
+
+  # Follow
+  follow(userId: UUID!): User!
+  unfollow(userId: UUID!): User!
+
+  # Block / Mute
+  blockUser(userId: UUID!): Boolean!
+  unblockUser(userId: UUID!): Boolean!
+  muteUser(userId: UUID!): Boolean!
+  unmuteUser(userId: UUID!): Boolean!
+
+  # DM
+  createConversation(input: CreateConversationInput!): Conversation!
+  sendMessage(input: SendMessageInput!): Message!
+  markConversationRead(conversationId: UUID!): Boolean!
+
+  # Notifications
+  markNotificationsRead(ids: [UUID!]!): Boolean!
+  markAllNotificationsRead: Boolean!
+
+  # Timeline cursor
+  updateTimelineCursor(lastSeenPostId: UUID!): Boolean!
+
+  # Media upload
+  uploadMedia(file: Upload!): Media!
+}
+
+# ============================================================
+# Subscriptions (WebSocket)
+# ============================================================
+type Subscription {
+  # リアルタイム新着投稿（タイムライン）
+  newTimelinePost: Post!
+
+  # DM リアルタイム
+  newMessage(conversationId: UUID!): Message!
+
+  # 通知リアルタイム
+  newNotification: Notification!
+
+  # タイピングインジケーター
+  typingIndicator(conversationId: UUID!): TypingEvent!
+}
+
+type TypingEvent {
+  user: User!
+  conversationId: UUID!
+  isTyping: Boolean!
+}
