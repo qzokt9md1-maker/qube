@@ -30,6 +30,9 @@ type DBConfig struct {
 }
 
 func (c DBConfig) DSN() string {
+	if url := os.Getenv("DATABASE_URL"); url != "" {
+		return url
+	}
 	return "postgres://" + c.User + ":" + c.Password + "@" + c.Host + ":" + c.Port + "/" + c.Name + "?sslmode=" + c.SSLMode
 }
 
@@ -38,6 +41,7 @@ type RedisConfig struct {
 	Port     string
 	Password string
 	DB       int
+	TLS      bool
 }
 
 func (c RedisConfig) Addr() string {
@@ -82,6 +86,7 @@ func Load() *Config {
 			Port:     getEnv("REDIS_PORT", "6379"),
 			Password: getEnv("REDIS_PASSWORD", ""),
 			DB:       getEnvInt("REDIS_DB", 0),
+			TLS:      getEnv("REDIS_TLS", "") == "true",
 		},
 		JWT: JWTConfig{
 			Secret:          getEnv("JWT_SECRET", "qube-dev-secret-change-in-production"),

@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: qube-api
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    region: singapore
+    plan: free
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        value: "6379"
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: REDIS_TLS
+        value: "true"
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: BASE_URL
+        sync: false

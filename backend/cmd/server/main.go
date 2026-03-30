@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -89,8 +90,14 @@ func main() {
 	r.Use(chimw.RequestID)
 	r.Use(chimw.RealIP)
 	r.Use(chimw.Timeout(30 * time.Second))
+	corsOrigins := []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8080", "https://qube.social"}
+	if extra := os.Getenv("CORS_ORIGINS"); extra != "" {
+		for _, o := range strings.Split(extra, ",") {
+			corsOrigins = append(corsOrigins, strings.TrimSpace(o))
+		}
+	}
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001", "http://localhost:8080", "https://qube.social"},
+		AllowedOrigins:   corsOrigins,
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true,
@@ -119,9 +126,13 @@ func main() {
 
 	// Upload endpoint
 	uploadDir := "./uploads"
+	baseURL := os.Getenv("BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:8080"
+	}
 	uploadHandler := &handler.UploadHandler{
 		UploadDir: uploadDir,
-		BaseURL:   "http://localhost:8080",
+		BaseURL:   baseURL,
 	}
 	r.Handle("/upload", uploadHandler)
 
